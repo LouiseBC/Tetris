@@ -161,7 +161,7 @@ public:
 
 class L_block : public Tetromino {
 public:
-    L_block(const int& xpos, const int& ypos) : Tetromino(101, 101, 101)
+    L_block(const int& xpos, const int& ypos) : Tetromino(255, 130, 163)
     {
         X = xpos;
         Y = ypos;
@@ -205,7 +205,7 @@ public:
 
 class J_block : public Tetromino {
 public:
-    J_block(const int& xpos, const int& ypos) : Tetromino(101, 101, 101)
+    J_block(const int& xpos, const int& ypos) : Tetromino(243, 156, 18)
     {
         X = xpos;
         Y = ypos;

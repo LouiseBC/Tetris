@@ -22,15 +22,14 @@ const Tetromino::Rotation Tetromino::next_pos() const
     return next;
 }
 
+void Tetromino::move(const int& x, const int& y)
+{
+    X = x; Y = y;
+}
 
 void Tetromino::drop()
 {
     Y += SIZE + PADDING;
-}
-
-void Tetromino::hard_drop()
-{
-    
 }
 
 void Tetromino::left()

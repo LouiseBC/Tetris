@@ -9,10 +9,10 @@ public:
     using Block = SDL_Rect;
     
     void drop();
-    void hard_drop();
     void rotate();
     void left();
     void right();
+    void move(const int& x, const int& y);
     
     const Rotation current_pos() const;
     const Rotation next_pos() const;
@@ -32,6 +32,7 @@ protected:
     
     int currentRotation = 0;
     std::vector<Rotation> rotations;
+    Rotation current;
     
     // Construction Details
     const int SIZE = 24;
