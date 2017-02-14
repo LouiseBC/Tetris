@@ -14,26 +14,32 @@ bool Board::init(Engine *gam, Graphics *graphs, std::shared_ptr<Player> plyr)
     player = plyr;
     
     srand(static_cast<int>(time(NULL)));
+    tetrominoBag = fill_bag();
     
-    int random = (rand() % 7);
-    current.reset(new_tetromino(random));
-    current->move(MIDDLE_X, Y_OFFSET - GRIDSIZE); // start first tetromino visible
-    
-    // copy of current
+    current.reset(new_tetromino(tetrominoBag.back()));
+    current->move(MIDDLE_X, Y_OFFSET - GRIDSIZE * 3);
     if (drawShadow)
-        shadow.reset(new_tetromino(random));
+        shadow.reset(new_tetromino(tetrominoBag.back()));
+    tetrominoBag.pop_back();
     
-    random = (rand() % 7);
-    next.reset(new_tetromino(random));
+    next.reset(new_tetromino(tetrominoBag.back()));
+    tetrominoBag.pop_back();
     
-    colours.push_back(RGB{101, 101, 101}); // Grey
-    colours.push_back(RGB{255, 130, 163}); // Yellow
-    colours.push_back(RGB{251, 188, 5}); // Pink
+    //colours.push_back(RGB{101, 101, 101}); // Grey
+    //colours.push_back(RGB{255, 130, 163}); // Pink
     //colours.push_back(RGB{243, 156, 18}); // Orange
-    //colours.push_back(RGB{52, 168, 83}); // Green
-    //colours.push_back(RGB{234, 67, 53}); // Red
-    //colours.push_back(RGB{44, 133, 244}); // Blue
-    return soundboard.init();
+    colours.push_back(RGB{251, 188, 5}); // Yellow
+    colours.push_back(RGB{52, 168, 83}); // Green
+    colours.push_back(RGB{44, 133, 244}); // Blue
+    colours.push_back(RGB{234, 67, 53}); // Red
+    return true;
+}
+
+std::vector<int> Board::fill_bag() {
+    std::vector<int> upcomingTetrominos {Tetromino::type::I, Tetromino::type::J, Tetromino::type::L,
+                                         Tetromino::type::O, Tetromino::type::S, Tetromino::type::T, Tetromino::type::Z};
+    std::random_shuffle(upcomingTetrominos.begin(), upcomingTetrominos.end());
+    return std::move(upcomingTetrominos);
 }
 
 void Board::handle_input(SDL_Event& event)
@@ -42,19 +48,19 @@ void Board::handle_input(SDL_Event& event)
         if (event.key.keysym.sym == SDLK_LEFT) {
             if (allowed_left(current->current_pos())) {
                 current->left();
-                lockDelay = defaultLockDelay;
+                lockTimer = defaultLockDelay;
             }
         }
         else if (event.key.keysym.sym == SDLK_RIGHT) {
             if (allowed_right(current->current_pos())) {
                 current->right();
-                lockDelay = defaultLockDelay;
+                lockTimer = defaultLockDelay;
             }
         }
         else if (event.key.keysym.sym == SDLK_UP) {
             if (rotation_allowed()) {
                 current->rotate();
-                lockDelay = defaultLockDelay;
+                lockTimer = defaultLockDelay;
             }
         }
         else if (event.key.keysym.sym == SDLK_DOWN) {
@@ -147,7 +153,7 @@ void Board::update(const float& deltatime)
     
     // Drop blocks
     if (!hardDrop) {
-        if (lockDelay == defaultLockDelay) { // Block isn't mid-lock
+        if (lockTimer == defaultLockDelay) { // Block isn't mid-lock
             currDelay += deltatime;
             if (currDelay >= dropDelay) {
                 currDelay = 0.0f;
@@ -158,11 +164,11 @@ void Board::update(const float& deltatime)
         // Fix tetrominos to other blocks/ground
         if (check_collision(current->current_pos()) == true) {
             if (!game_is_over()) {
-                lockDelay -= deltatime;
-                if (lockDelay <= 0) {
+                lockTimer -= deltatime;
+                if (lockTimer <= 0) {
                     add_to_landed(current->current_pos());
                     load_next_block();
-                    lockDelay = defaultLockDelay;
+                    lockTimer = defaultLockDelay;
                 }
             }
         }
@@ -235,6 +241,7 @@ void Board::add_to_landed(const Tetromino::Rotation& rotation)
 }
 
 int Board::completed_row()
+// Returns the number of the row that has been completed
 {
     for (int i = landed_rows.size()-1; i >= 0; --i) {
         bool completed = true;
@@ -289,7 +296,12 @@ void Board::load_next_block()
     
     shadow.reset(new_tetromino(current->type()));
     
-    next.reset(new_tetromino((rand() % 7)));
+    if (tetrominoBag.empty())
+        tetrominoBag = fill_bag();
+    
+    next.reset(new_tetromino(tetrominoBag.back()));
+    tetrominoBag.pop_back();
+    
 }
 
 Tetromino* Board::new_tetromino(const int& randomInt)

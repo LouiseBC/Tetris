@@ -18,11 +18,8 @@ public:
     std::vector<Tetromino::Rotation> add_to_boardState(const Tetromino::Rotation& rotation);
     
     std::vector<double> assign_scores();
-    int highest_row(const std::vector<Tetromino::Rotation>& state);
+    int aggregate_height(const std::vector<Tetromino::Rotation>& state);
     int holes(const std::vector<Tetromino::Rotation>& state);
-    int wells(const std::vector<Tetromino::Rotation>& state);
-    int empty_rows(const std::vector<Tetromino::Rotation>& state);
-    int peak_difference();
     int uncompleted_rows(const std::vector<Tetromino::Rotation>& state);
     int column_transitions(const std::vector<Tetromino::Rotation>& state);
     int row_transitions(const std::vector<Tetromino::Rotation>& state);

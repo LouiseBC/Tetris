@@ -15,6 +15,11 @@ void HUD::init(Graphics *graphs)
     SDL_QueryTexture(levelText, NULL, NULL, &W, &H);
     levelTextPos = SDL_Rect{ BOARD_PADDING + BOARD_WIDTH - W-12, BOARD_PADDING-H-3, W, H };
     render_level(0);
+    
+    rowsText = graphics->renderText("Rows cleared: ", fontPath, fontColour, 15);
+    SDL_QueryTexture(rowsText, NULL, NULL, &W, &H);
+    rowsTextPos = SDL_Rect{ BOARD_PADDING, BOARD_PADDING + BOARD_HEIGHT + H/2, W, H};
+    render_rows(0);
 
     gameOver = graphics->renderText("Game Over!", fontPath, fontColour, 25);
     SDL_QueryTexture(gameOver, NULL, NULL, &W, &H);
@@ -39,6 +44,14 @@ void HUD::render_level(const int& currLevel)
     levelPos = SDL_Rect{ levelTextPos.x+levelTextPos.w + 5, BOARD_PADDING-H-3, W, H };
 }
 
+void HUD::render_rows(const int &nrows) {
+    std::string rowscount = std::to_string(nrows);
+    nRows = graphics->renderText(rowscount, fontPath, fontColour, 15);
+    int W; int H;
+    SDL_QueryTexture(nRows, NULL, NULL, &W, &H);
+    nRowsPos = SDL_Rect{ rowsTextPos.x+rowsTextPos.w + 5, BOARD_PADDING + BOARD_HEIGHT + H/2, W, H};
+}
+
 void HUD::draw_gameover()
 {
     SDL_RenderCopy(graphics->renderer(), gameOver, NULL, &gameOverPos);
@@ -51,4 +64,7 @@ void HUD::draw()
     
     SDL_RenderCopy(graphics->renderer(), levelText, NULL, &levelTextPos);
     SDL_RenderCopy(graphics->renderer(), level, NULL, &levelPos);
+    
+    SDL_RenderCopy(graphics->renderer(), rowsText, NULL, &rowsTextPos);
+    SDL_RenderCopy(graphics->renderer(), nRows, NULL, &nRowsPos);
 }

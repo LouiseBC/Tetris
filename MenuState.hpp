@@ -18,12 +18,6 @@ private:
     Engine* game;
     Graphics* graphics;
     
-    Board board;
-    std::shared_ptr<Player> player;
-    HUD hud;
-    
-    bool start = true;
-    bool pause = true;
 };
 
 #endif /* MainState_hpp */

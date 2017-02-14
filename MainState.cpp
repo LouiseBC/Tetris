@@ -45,6 +45,7 @@ void MainState::update(const float& dt)
         board.update(dt);
         hud.render_score(player->score());
         hud.render_level(player->level());
+        hud.render_rows(board.cleared_rows());
         player->update();
     }
     //SDL_Delay(100);
@@ -62,4 +63,3 @@ void MainState::render()
     
     graphics->present();
 }
-

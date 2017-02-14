@@ -1,5 +1,6 @@
 #include "AI.hpp"
 #include <iostream>
+#include <numeric>
 
 void AI::init(Board* tetrisboard)
 {
@@ -33,7 +34,7 @@ void AI::choose_move()
     std::vector<double> stateScores = assign_scores();
     auto best = std::min_element(stateScores.begin(), stateScores.end());
     int bestindex = best-stateScores.begin();
-    std::cerr << "Best: " << bestindex << std::endl << std::endl;
+    //std::cerr << "Best: " << bestindex << std::endl << std::endl;
     moveQueue = possibleMoves[bestindex];
 }
 
@@ -46,15 +47,11 @@ std::vector<double> AI::assign_scores()
         
         currScore += 0.80 * uncompleted_rows(state);
         currScore += 1.20 * holes(state);
-        //currScore += 0.01 * wells(state);
-        currScore += 0.01 * column_transitions(state);
+        currScore += 0.20 * aggregate_height(state);
         currScore += 0.50 * row_transitions(state);
-        
-        currScore += 0.20 * peak_difference();
-        currScore += 0.05 * highest_row(state);
+        currScore += 0.01 * column_transitions(state);
         
         scores.push_back(currScore/6);
-        std::cerr << "Total: " << double(currScore/6) << std::endl;
     }
     
     return scores;
@@ -74,31 +71,18 @@ int AI::holes(const std::vector<Tetromino::Rotation>& state)
             }
         }
     }
-    std::cerr << "Holes: " << holes << std::endl;
     return holes;
 }
 
-int AI::wells(const std::vector<Tetromino::Rotation>& state)
+int AI::aggregate_height(const std::vector<Tetromino::Rotation>& state)
+// Sum height of each column
 {
-    int wells = 0;
-    for (auto row : state) {
-        for (int i = 1; i < row.size()-1; ++i) {
-            if (row[i-1].w > 0 && row[i].w == 0 && row[i+1].w > 0) ++wells;
-        }
-    }
-    std::cerr << wells << std::endl;
-    return wells;
-}
-
-int AI::highest_row(const std::vector<Tetromino::Rotation>& state)
-{
-    std::vector<int> skyline = make_skyline(state);
-    auto highest = std::max_element(skyline.begin(), skyline.end());
-    std::cerr << "Highest: " << *highest << std::endl;
-    return *highest;
+    std::vector<int>skyline = make_skyline(state);
+    return std::accumulate(skyline.begin(), skyline.end(), 0);
 }
 
 int AI::column_transitions(const std::vector<Tetromino::Rotation>& state)
+// No. changes from full to empty and vice-versa
 {
     std::vector<int> skyline = make_skyline(state);
     
@@ -108,11 +92,11 @@ int AI::column_transitions(const std::vector<Tetromino::Rotation>& state)
             if (state[y][x].w != state[y+1][x].w) ++ transitions;
         }
     }
-    std::cerr << "YTransitions: " << transitions << std::endl;
     return transitions;
 }
 
 int AI::row_transitions(const std::vector<Tetromino::Rotation>& state)
+// No. changes from full to empty and vice-versa
 {
     std::vector<int> skyline = make_skyline(state);
     auto highest = std::max_element(skyline.begin(), skyline.end());
@@ -123,39 +107,11 @@ int AI::row_transitions(const std::vector<Tetromino::Rotation>& state)
             if (state[y][x].w != state[y][x+1].w) ++ transitions;
         }
     }
-    std::cerr << "XTransitions: " << transitions << std::endl;
     return transitions;
 }
 
-int AI::empty_rows(const std::vector<Tetromino::Rotation>& state)
-{
-    // only care about emptiness in old boardstate: creating new half-empty lines is ok
-    std::vector<int> oldskyline = make_skyline(board->board_state());
-    auto highest = std::max_element(oldskyline.begin(), oldskyline.end());
-    
-    double emptiness = 0.0;
-    for (int i = state.size() - *highest; i < state.size(); ++i) { // Skyline counts 1 upwards
-        for (auto cols : state[i])
-            if (cols.w == 0) ++emptiness;
-    }
-    emptiness = emptiness / (*highest * board->COLS);
-    std::cerr << "Emptiness: " << emptiness << std::endl;
-    return emptiness;
-}
-
-int AI::peak_difference()
-// Highest peak
-{
-    std::vector<int> oldskyline = make_skyline(board->board_state());
-    int max = *std::max_element(oldskyline.begin(), oldskyline.end());
-    int min = *std::min_element(oldskyline.begin(), oldskyline.end());
-    int difference = max-min;
-    std::cerr << "Alt diff: " << difference << std::endl;
-    return difference;
-}
-
 int AI::uncompleted_rows(const std::vector<Tetromino::Rotation>& state)
-// 1 - (percentage completed rows)
+// No. of uncompleted rows that have >= 1 block
 {
     const std::vector<int> oldskyline = make_skyline(board->board_state());
     auto highestRow = std::max_element(oldskyline.begin(), oldskyline.end());
@@ -173,12 +129,11 @@ int AI::uncompleted_rows(const std::vector<Tetromino::Rotation>& state)
         if (completed) ++nCompleted;
     }
     nCompleted = *highestRow - nCompleted;
-    //nCompleted = 1 - (nCompleted / static_cast<double>(*highestRow));
-    std::cerr << "%Completed: " << nCompleted << std::endl;
     return nCompleted;
 }
 
 std::vector<int> AI::make_skyline(const std::vector<Tetromino::Rotation>& state)
+// Determines the highest row in each column
 {
     int lowestY = board->Y_OFFSET + board->BORDER_WIDTH + (board->ROWS*board->GRIDSIZE);
     std::vector<int> skyline(board->COLS, 0);
