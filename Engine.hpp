@@ -15,12 +15,12 @@ public:
     
     void update();
     void render();
-    void quit();
     
     void setQuit();
     
 private:
     Graphics graphics;
+    std::unique_ptr<GameState> state;
     std::vector<std::unique_ptr<GameState>> states;
     
     bool quitGame { false };

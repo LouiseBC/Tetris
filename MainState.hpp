@@ -8,8 +8,8 @@
 
 class MainState : public GameState {
 public:
+    MainState(const bool isHuman);
     bool init(Engine* game, Graphics* graphics);
-    ~MainState();
     
     void handle_input(SDL_Event& event);
     void update(const float& deltatime);
@@ -18,12 +18,12 @@ private:
     Engine* game;
     Graphics* graphics;
     
+    const bool isHuman;
     Board board;
     std::shared_ptr<Player> player;
     HUD hud;
     
-    bool start = true;
-    bool pause = true;
+    bool pause = false;
 };
 
 #endif /* MainState_hpp */

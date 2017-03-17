@@ -34,7 +34,6 @@ void AI::choose_move()
     std::vector<double> stateScores = assign_scores();
     auto best = std::min_element(stateScores.begin(), stateScores.end());
     int bestindex = best-stateScores.begin();
-    //std::cerr << "Best: " << bestindex << std::endl << std::endl;
     moveQueue = possibleMoves[bestindex];
 }
 

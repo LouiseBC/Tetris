@@ -1,24 +1,24 @@
+#include <iostream>
 #include "MainState.hpp"
 #include "Engine.hpp"
 #include "Graphics.hpp"
-#include <iostream>
-//#include "AI.hpp"
+
+MainState::MainState(const bool human)
+: isHuman{human} {}
 
 bool MainState::init(Engine* gam, Graphics* graphs)
 {
     game = gam;
     graphics = graphs;
     
-    player.reset(new AI);
+    if (isHuman)
+        player.reset(new Player);
+    else
+        player.reset(new AI);
     player->init(&board);
     
     hud.init(graphs);
     return board.init(gam, graphs, player);
-}
-
-MainState::~MainState()
-{
-    
 }
 
 void MainState::handle_input(SDL_Event& event)
@@ -28,9 +28,7 @@ void MainState::handle_input(SDL_Event& event)
     if (event.type == SDL_KEYDOWN) {
         if (event.key.keysym.sym == SDLK_ESCAPE)
             game->setQuit();
-        if (event.key.keysym.sym == SDLK_RETURN && start == false)
-            start = true;
-        if (event.key.keysym.sym == SDLK_p)
+        if (event.key.keysym.sym == SDLK_RETURN)
             pause = !pause;
         else
             board.handle_input(event);
@@ -41,15 +39,13 @@ void MainState::handle_input(SDL_Event& event)
 
 void MainState::update(const float& dt)
 {
-    if (start && !pause && !player->game_over()) {
+    if (!pause && !player->game_over()) {
         board.update(dt);
         hud.render_score(player->score());
         hud.render_level(player->level());
         hud.render_rows(board.cleared_rows());
         player->update();
     }
-    //SDL_Delay(100);
-    //pause = true;
 }
 
 void MainState::render()

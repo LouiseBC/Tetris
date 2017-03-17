@@ -24,10 +24,7 @@ bool Board::init(Engine *gam, Graphics *graphs, std::shared_ptr<Player> plyr)
     
     next.reset(new_tetromino(tetrominoBag.back()));
     tetrominoBag.pop_back();
-    
-    //colours.push_back(RGB{101, 101, 101}); // Grey
-    //colours.push_back(RGB{255, 130, 163}); // Pink
-    //colours.push_back(RGB{243, 156, 18}); // Orange
+
     colours.push_back(RGB{251, 188, 5}); // Yellow
     colours.push_back(RGB{52, 168, 83}); // Green
     colours.push_back(RGB{44, 133, 244}); // Blue
@@ -331,7 +328,7 @@ void Board::draw()
     if (drawShadow)
         draw_shadow();
     draw_current();
-    draw_grid();
+    draw_border();
     draw_landed();
     draw_next();
 }
@@ -372,7 +369,7 @@ void Board::draw_landed()
     }
 }
 
-void Board::draw_grid()
+void Board::draw_border()
 {
     
     SDL_SetRenderDrawColor(graphics->renderer(), 255, 255, 255, 1);
