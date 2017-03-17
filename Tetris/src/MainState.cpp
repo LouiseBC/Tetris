@@ -3,12 +3,18 @@
 #include "Engine.hpp"
 #include "Graphics.hpp"
 
+MainState::MainState(const bool human)
+: isHuman{human} {}
+
 bool MainState::init(Engine* gam, Graphics* graphs)
 {
     game = gam;
     graphics = graphs;
     
-    player.reset(new AI);
+    if (isHuman)
+        player.reset(new Player);
+    else
+        player.reset(new AI);
     player->init(&board);
     
     hud.init(graphs);

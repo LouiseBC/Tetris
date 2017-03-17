@@ -8,6 +8,7 @@
 
 class MainState : public GameState {
 public:
+    MainState(const bool isHuman);
     bool init(Engine* game, Graphics* graphics);
     
     void handle_input(SDL_Event& event);
@@ -17,6 +18,7 @@ private:
     Engine* game;
     Graphics* graphics;
     
+    const bool isHuman;
     Board board;
     std::shared_ptr<Player> player;
     HUD hud;
