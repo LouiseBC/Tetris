@@ -328,7 +328,7 @@ void Board::draw()
     if (drawShadow)
         draw_shadow();
     draw_current();
-    draw_grid();
+    draw_border();
     draw_landed();
     draw_next();
 }
@@ -369,7 +369,7 @@ void Board::draw_landed()
     }
 }
 
-void Board::draw_grid()
+void Board::draw_border()
 {
     
     SDL_SetRenderDrawColor(graphics->renderer(), 255, 255, 255, 1);

@@ -35,7 +35,7 @@ private:
     void draw_shadow();
     void draw_next();
     void draw_landed();
-    void draw_grid();
+    void draw_border();
     
     // Access
     std::vector<Tetromino::Rotation> board_state() { return landed_rows; }
