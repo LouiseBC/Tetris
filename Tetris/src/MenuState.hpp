@@ -30,7 +30,7 @@ private:
     SDL_Rect selection;
     bool gameType { true };
 
-    const std::string fontPath {"assets/GreenFlame.ttf"};
+    const std::string fontPath {"../assets/GreenFlame.ttf"};
     SDL_Color fontColour {1, 1, 1, 1};
     
 };

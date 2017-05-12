@@ -18,7 +18,7 @@ private:
     const int BOARD_PADDING = 50;
     const int BOARD_WIDTH = 10 * 25;
     const int BOARD_HEIGHT = 20 * 25;
-    const std::string fontPath {"assets/GreenFlame.ttf"};
+    const std::string fontPath {"../assets/GreenFlame.ttf"};
     SDL_Color fontColour {1, 1, 1, 1};
     
     SDL_Texture* scoreText;
